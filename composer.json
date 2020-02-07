@@ -1,0 +1,10 @@
+{
+  "name": "redrum0x/embroidery",
+  "description": "PES file embroidery reader",
+  "homepage": "https://github.com/redrum0x/embroidery",
+  "license": "GPL-2.0-with-autoconf-exception",
+  "type": "library",
+  "require": {
+    "php": ">=7.1.0"
+  }
+}
