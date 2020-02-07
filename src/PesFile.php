@@ -27,42 +27,70 @@ A copy of the full GPL 2 license can be found in the docs directory.
 You can contact me at http://www.njcrawford.com/contact.php.
 */
 
+use ReflectionClass;
+
 class PesFile
 {
+    /**
+     * @var int
+     */
     public $imageWidth;
+
+    /**
+     * @var int
+     */
     public $imageHeight;
+
+    /**
+     * @var int
+     */
     public $pesHeader; // int64
-    public $blocks; // stitchBlock
-    public $colorTable;
+
+    /**
+     * @var StitchBlock
+     */
+    public $blocks;
+
+    /**
+     * @var int
+     */
     public $startStitches = 0; // int64
-    public $lastError = ''; // string
-    public $pesNum = ''; // string
+
+    /**
+     * @var string
+     */
+    public $lastError = '';
+
+    /**
+     * @var string
+     */
+    public $pesNum = '';
+
+    /**
+     * @var PesPoint
+     */
     public $min; // point
 
-    //means we couldn't figure out some or all
-    //of the colors, best guess will be used
-    private $colorWarning = false; // bool
-    private $formatWarning = false; // bool
-    private $classWarning = false; // bool
 
     /**
      * PesFile constructor.
-     * @param $filename
+     * @param string $filename
      */
-    public function __construct($filename)
+    public function __construct(string $filename)
     {
+        $this->min = new PesPoint();
         $this->OpenFile($filename);
     }
 
     /**
-     * @param $filename
+     * @param string $filename
      * @return bool
+     * @throws \ReflectionException
      */
-    public function OpenFile($filename): bool
+    public function OpenFile(string $filename): bool
     {
         $file = fopen($filename, 'rb');
         if (!$file) {
-
             return false;
         }
         // 4 bytes
@@ -101,7 +129,6 @@ class PesFile
         $maxY = 0;
         $minY = 0;
         $colorNum = -1;
-        $colorIndex = 0;
         $tempStitches = array();
         while (!$thisPartIsDone && !feof($file)) {
             $val1 = $this->readInt8($file);
@@ -208,7 +235,8 @@ class PesFile
      */
     private function readInt16($file)
     {
-        return (array_shift(unpack('v', fread($file, 2))));
+        $res = unpack('v', fread($file, 2));
+        return (array_shift($res));
     }
 
     /**
@@ -217,214 +245,90 @@ class PesFile
      */
     private function readInt32($file)
     {
-        return (array_shift(unpack('V', fread($file, 4))));
+        $res = unpack('V', fread($file, 4));
+        return (array_shift($res));
     }
 
     /**
      * @param $index
      * @return PesColor
+     * @throws \ReflectionException
      */
     private function getColorFromIndex($index): PesColor
     {
-        switch ($index) {
-            case 1:
-                $color = new PesColor(14, 31, 124);
-                break;
-            case 2:
-                $color = new PesColor(10, 85, 163);
-                break;
-            case 3:
-                $color = new PesColor(48, 135, 119);
-                break;
-            case 4:
-                $color = new PesColor(75, 107, 175);
-                break;
-            case 5:
-                $color = new PesColor(237, 23, 31);
-                break;
-            case 6:
-                $color = new PesColor(209, 92, 0);
-                break;
-            case 7:
-                $color = new PesColor(145, 54, 151);
-                break;
-            case 8:
-                $color = new PesColor(228, 154, 203);
-                break;
-            case 9:
-                $color = new PesColor(145, 95, 172);
-                break;
-            case 10:
-                $color = new PesColor(157, 214, 125);
-                break;
-            case 11:
-                $color = new PesColor(232, 169, 0);
-                break;
-            case 12:
-                $color = new PesColor(254, 186, 53);
-                break;
-            case 13:
-                $color = new PesColor(255, 255, 0);
-                break;
-            case 14:
-                $color = new PesColor(112, 188, 31);
-                break;
-            case 15:
-                $color = new PesColor(192, 148, 0);
-                break;
-            case 16:
-                $color = new PesColor(168, 168, 168);
-                break;
-            case 17:
-                $color = new PesColor(123, 111, 0);
-                break;
-            case 18:
-                $color = new PesColor(255, 255, 179);
-                break;
-            case 19:
-                $color = new PesColor(79, 85, 86);
-                break;
-            case 20:
-                $color = new PesColor(0, 0, 0);
-                break;
-            case 21:
-                $color = new PesColor(11, 61, 145);
-                break;
-            case 22:
-                $color = new PesColor(119, 1, 118);
-                break;
-            case 23:
-                $color = new PesColor(41, 49, 51);
-                break;
-            case 24:
-                $color = new PesColor(42, 19, 1);
-                break;
-            case 25:
-                $color = new PesColor(246, 74, 138);
-                break;
-            case 26:
-                $color = new PesColor(178, 118, 36);
-                break;
-            case 27:
-                $color = new PesColor(252, 187, 196);
-                break;
-            case 28:
-                $color = new PesColor(254, 55, 15);
-                break;
-            case 29:
-                $color = new PesColor(240, 240, 240);
-                break;
-            case 30:
-                $color = new PesColor(106, 28, 138);
-                break;
-            case 31:
-                $color = new PesColor(168, 221, 196);
-                break;
-            case 32:
-                $color = new PesColor(37, 132, 187);
-                break;
-            case 33:
-                $color = new PesColor(254, 179, 67);
-                break;
-            case 34:
-                $color = new PesColor(255, 240, 141);
-                break;
-            case 35:
-                $color = new PesColor(208, 166, 96);
-                break;
-            case 36:
-                $color = new PesColor(209, 84, 0);
-                break;
-            case 37:
-                $color = new PesColor(102, 186, 73);
-                break;
-            case 38:
-                $color = new PesColor(19, 74, 70);
-                break;
-            case 39:
-                $color = new PesColor(135, 135, 135);
-                break;
-            case 40:
-                $color = new PesColor(216, 202, 198);
-                break;
-            case 41:
-                $color = new PesColor(67, 86, 7);
-                break;
-            case 42:
-                $color = new PesColor(254, 227, 197);
-                break;
-            case 43:
-                $color = new PesColor(249, 147, 188);
-                break;
-            case 44:
-                $color = new PesColor(0, 56, 34);
-                break;
-            case 45:
-                $color = new PesColor(178, 175, 212);
-                break;
-            case 46:
-                $color = new PesColor(104, 106, 176);
-                break;
-            case 47:
-                $color = new PesColor(239, 227, 185);
-                break;
-            case 48:
-                $color = new PesColor(247, 56, 102);
-                break;
-            case 49:
-                $color = new PesColor(181, 76, 100);
-                break;
-            case 50:
-                $color = new PesColor(19, 43, 26);
-                break;
-            case 51:
-                $color = new PesColor(199, 1, 85);
-                break;
-            case 52:
-                $color = new PesColor(254, 158, 50);
-                break;
-            case 53:
-                $color = new PesColor(168, 222, 235);
-                break;
-            case 54:
-                $color = new PesColor(0, 103, 26);
-                break;
-            case 55:
-                $color = new PesColor(78, 41, 144);
-                break;
-            case 56:
-                $color = new PesColor(47, 126, 32);
-                break;
-            case 57:
-                $color = new PesColor(253, 217, 222);
-                break;
-            case 58:
-                $color = new PesColor(255, 217, 17);
-                break;
-            case 59:
-                $color = new PesColor(9, 91, 166);
-                break;
-            case 60:
-                $color = new PesColor(240, 249, 112);
-                break;
-            case 61:
-                $color = new PesColor(227, 243, 91);
-                break;
-            case 62:
-                $color = new PesColor(255, 200, 100);
-                break;
-            case 63:
-                $color = new PesColor(255, 200, 150);
-                break;
-            case 64:
-                $color = new PesColor(255, 200, 200);
-                break;
-            default:
-                $color = new PesColor(0, 0, 0);
-                $this->colorWarning = true;
-                break;
+        $colors = [
+            1 => [14, 31, 124],
+            2 => [10, 85, 163],
+            3 => [48, 135, 119],
+            4 => [75, 107, 175],
+            5 => [237, 23, 31],
+            6 => [209, 92, 0],
+            7 => [145, 54, 151],
+            8 => [228, 154, 203],
+            9 => [145, 95, 172],
+            10 => [157, 214, 125],
+            11 => [232, 169, 0],
+            12 => [254, 186, 53],
+            13 => [255, 255, 0],
+            14 => [112, 188, 31],
+            15 => [192, 148, 0],
+            16 => [168, 168, 168],
+            17 => [123, 111, 0],
+            18 => [255, 255, 179],
+            19 => [79, 85, 86],
+            20 => [0, 0, 0],
+            21 => [11, 61, 145],
+            22 => [119, 1, 118],
+            23 => [41, 49, 51],
+            24 => [42, 19, 1],
+            25 => [246, 74, 138],
+            26 => [178, 118, 36],
+            27 => [252, 187, 196],
+            28 => [254, 55, 15],
+            29 => [240, 240, 240],
+            30 => [106, 28, 138],
+            31 => [168, 221, 196],
+            32 => [37, 132, 187],
+            33 => [254, 179, 67],
+            34 => [255, 240, 141],
+            35 => [208, 166, 96],
+            36 => [209, 84, 0],
+            37 => [102, 186, 73],
+            38 => [19, 74, 70],
+            39 => [135, 135, 135],
+            40 => [216, 202, 198],
+            41 => [67, 86, 7],
+            42 => [254, 227, 197],
+            43 => [249, 147, 188],
+            44 => [0, 56, 34],
+            45 => [178, 175, 212],
+            46 => [104, 106, 176],
+            47 => [239, 227, 185],
+            48 => [247, 56, 102],
+            49 => [181, 76, 100],
+            50 => [19, 43, 26],
+            51 => [199, 1, 85],
+            52 => [254, 158, 50],
+            53 => [168, 222, 235],
+            54 => [0, 103, 26],
+            55 => [78, 41, 144],
+            56 => [47, 126, 32],
+            57 => [253, 217, 222],
+            58 => [255, 217, 17],
+            59 => [9, 91, 166],
+            60 => [240, 249, 112],
+            61 => [227, 243, 91],
+            62 => [255, 200, 100],
+            63 => [255, 200, 150],
+            64 => [255, 200, 200],
+        ];
+
+        if (!isset($colors[$index])) {
+            throw new \RuntimeException('Color ' . $index . ' invalid');
         }
-        return $color;
+
+        $reflector = new ReflectionClass(PesColor::class);
+        return $reflector->newInstanceArgs($colors[$index]);
     }
 }
 

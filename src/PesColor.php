@@ -8,8 +8,19 @@ namespace redrum0x\embroidery;
  */
 class PesColor
 {
+    /**
+     * @var int
+     */
     public $r;
+
+    /**
+     * @var int
+     */
     public $g;
+
+    /**
+     * @var int
+     */
     public $b;
 
     /**
@@ -18,7 +29,7 @@ class PesColor
      * @param int $g
      * @param int $b
      */
-    public function __construct($r = 0, $g = 0, $b = 0)
+    public function __construct(int $r = 0, int $g = 0, int $b = 0)
     {
         $this->r = $r;
         $this->g = $g;

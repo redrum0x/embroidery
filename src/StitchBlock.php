@@ -8,10 +8,25 @@ namespace redrum0x\embroidery;
  */
 class StitchBlock
 {
-    public $color; // color
-    public $colorIndex; // int32
-    public $stitchesTotal; // int32
-    public $stitches; // array
+    /**
+     * @var PesColor
+     */
+    public $color;
+
+    /**
+     * @var int
+     */
+    public $colorIndex;
+
+    /**
+     * @var int
+     */
+    public $stitchesTotal;
+
+    /**
+     * @var array
+     */
+    public $stitches;
 
     /**
      * StitchBlock constructor.

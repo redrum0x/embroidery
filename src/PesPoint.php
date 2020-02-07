@@ -9,7 +9,14 @@ namespace redrum0x\embroidery;
  */
 class PesPoint
 {
+    /**
+     * @var int
+     */
     public $x;
+
+    /**
+     * @var int
+     */
     public $y;
 
     /**
@@ -17,7 +24,7 @@ class PesPoint
      * @param int $x
      * @param int $y
      */
-    public function __construct($x = 0, $y = 0)
+    public function __construct(int $x = 0, int $y = 0)
     {
         $this->x = $x;
         $this->y = $y;

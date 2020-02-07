@@ -12,7 +12,7 @@ class ImageEmbroidery
      * @param int $scale_post
      * @param bool $scale_pre
      */
-    public function imageEmbroidery(PesFile $embroidery, $base = false, $scale_post = 1, $scale_pre = false)
+    public function imageEmbroidery(PesFile $embroidery, bool $base = false, int $scale_post = 1, bool $scale_pre = false)
     {
         $im = $this->embroidery2image($embroidery, $scale_post, $scale_pre);
         if ($base) {
@@ -56,7 +56,7 @@ class ImageEmbroidery
      * @param bool $scale_pre
      * @return false|resource
      */
-    public function embroidery2image(PesFile $embroidery, $scale_post = 1, $scale_pre = false)
+    public function embroidery2image(PesFile $embroidery, int $scale_post = 1, bool $scale_pre = false)
     {
         // Create image
         $im = imagecreatetruecolor(ceil($embroidery->imageWidth * $scale_post), ceil($embroidery->imageHeight * $scale_post));
@@ -100,7 +100,7 @@ class ImageEmbroidery
      * @param int $scale
      * @return mixed
      */
-    public function embroidery2svg(PesFile $embroidery, $scale = 1)
+    public function embroidery2svg(PesFile $embroidery, int $scale = 1)
     {
         // header('Content-Type: image/svg+xml');
         $xml = new SimpleXMLElement('<svg />');
