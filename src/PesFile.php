@@ -47,7 +47,7 @@ class PesFile
     public $pesHeader; // int64
 
     /**
-     * @var StitchBlock
+     * @var StitchBlock[]
      */
     public $blocks;
 
@@ -71,6 +71,15 @@ class PesFile
      */
     public $min; // point
 
+    /**
+     * @var PesColor[]
+     */
+    public $colors;
+
+    /**
+     * @var int
+     */
+    public $countStitches;
 
     /**
      * PesFile constructor.
@@ -217,6 +226,9 @@ class PesFile
         $this->min->x = $minX;
         $this->min->y = $minY;
 
+        $this->calcColors();
+        $this->calcStitches();
+
         return true;
     }
 
@@ -329,6 +341,27 @@ class PesFile
 
         $reflector = new ReflectionClass(PesColor::class);
         return $reflector->newInstanceArgs($colors[$index]);
+    }
+
+
+    /**
+     * calc unique colors
+     */
+    public function calcColors(): void
+    {
+        foreach ($this->blocks as $block) {
+            $this->colors[$block->colorIndex] = $block->color;
+        }
+    }
+
+    /**
+     * calc sitches
+     */
+    public function calcStitches(): void
+    {
+        foreach ($this->blocks as $block) {
+            $this->countStitches += $block->stitchesTotal;
+        }
     }
 }
 

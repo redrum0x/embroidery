@@ -1,4 +1,4 @@
-###### **PES file embroidery reader**
+# **PES file embroidery reader**
 
 
 **Usage**
