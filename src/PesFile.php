@@ -28,6 +28,8 @@ You can contact me at http://www.njcrawford.com/contact.php.
 */
 
 use ReflectionClass;
+use ReflectionException;
+use RuntimeException;
 
 class PesFile
 {
@@ -84,6 +86,7 @@ class PesFile
     /**
      * PesFile constructor.
      * @param string $filename
+     * @throws ReflectionException
      */
     public function __construct(string $filename)
     {
@@ -94,7 +97,7 @@ class PesFile
     /**
      * @param string $filename
      * @return bool
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function OpenFile(string $filename): bool
     {
@@ -264,7 +267,7 @@ class PesFile
     /**
      * @param $index
      * @return PesColor
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function getColorFromIndex($index): PesColor
     {
@@ -336,7 +339,7 @@ class PesFile
         ];
 
         if (!isset($colors[$index])) {
-            throw new \RuntimeException('Color ' . $index . ' invalid');
+            throw new RuntimeException('Color ' . $index . ' invalid');
         }
 
         $reflector = new ReflectionClass(PesColor::class);

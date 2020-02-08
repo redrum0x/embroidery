@@ -5,7 +5,9 @@
   "license": "GPL-2.0-with-autoconf-exception",
   "type": "library",
   "require": {
-    "php": ">=7.1.0"
+    "php": ">=7.1.0",
+    "ext-gd": "*",
+    "ext-simplexml": "*"
   },
   "autoload": {
     "psr-4": {

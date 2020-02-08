@@ -54,9 +54,10 @@ class ImageEmbroidery
      * @param PesFile $embroidery
      * @param int $scale_post
      * @param bool $scale_pre
+     * @param int $thickness
      * @return false|resource
      */
-    public function embroidery2image(PesFile $embroidery, int $scale_post = 1, bool $scale_pre = false)
+    public function embroidery2image(PesFile $embroidery, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1)
     {
         // Create image
         $im = imagecreatetruecolor(ceil($embroidery->imageWidth * $scale_post), ceil($embroidery->imageHeight * $scale_post));
@@ -64,19 +65,21 @@ class ImageEmbroidery
         imagealphablending($im, false);
         $color = imagecolorallocatealpha($im, 255, 255, 255, 127);
         imagefill($im, 0, 0, $color);
-        imagesetthickness($im, 2);
+        imagesetthickness($im, $thickness);
 
         // Draw stitches
         foreach ($embroidery->blocks as $block) {
             $color = imagecolorallocate($im, $block->color->r, $block->color->g, $block->color->b);
             $x = false;
             foreach ($block->stitches as $stitch) {
-                if ($x !== false) imageline($im,
-                    ($x - $embroidery->min->x) * $scale_post,
-                    ($y - $embroidery->min->y) * $scale_post,
-                    ($stitch->x - $embroidery->min->x) * $scale_post,
-                    ($stitch->y - $embroidery->min->y) * $scale_post,
-                    $color);
+                if ($x !== false) {
+                    imageline($im,
+                        ($x - $embroidery->min->x) * $scale_post,
+                        ($y - $embroidery->min->y) * $scale_post,
+                        ($stitch->x - $embroidery->min->x) * $scale_post,
+                        ($stitch->y - $embroidery->min->y) * $scale_post,
+                        $color);
+                }
                 $x = $stitch->x;
                 $y = $stitch->y;
             }
@@ -98,9 +101,10 @@ class ImageEmbroidery
     /**
      * @param PesFile $embroidery
      * @param int $scale
+     * @param int $thickness
      * @return mixed
      */
-    public function embroidery2svg(PesFile $embroidery, int $scale = 1)
+    public function embroidery2svg(PesFile $embroidery, int $scale = 1, int $thickness = 1)
     {
         // header('Content-Type: image/svg+xml');
         $xml = new SimpleXMLElement('<svg />');
@@ -116,6 +120,7 @@ class ImageEmbroidery
             $line = $xml->addChild('path');
             $line->addAttribute('stroke', $this->rgb2html($block->color->r, $block->color->g, $block->color->b));
             $line->addAttribute('fill', 'none');
+            $line->addAttribute('stroke-width', $thickness);
             $points = '';
             foreach ($block->stitches as $stitch) {
                 $points .= ($points ? ' L ' : 'M ') . (($stitch->x - $embroidery->min->x) * $scale) . ' ' . (($stitch->y - $embroidery->min->y) * $scale);
@@ -124,6 +129,23 @@ class ImageEmbroidery
         }
 
         return ($xml->asXML());
+    }
+
+    /**
+     * @param PesFile $embroidery
+     * @param string $path
+     * @param int $scale_post
+     * @param bool $scale_pre
+     * @param int $thickness
+     * @return bool
+     */
+    public function embroidery2Jpg(PesFile $embroidery, string $path = null, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1): bool
+    {
+        $im = $this->embroidery2image($embroidery, $scale_post, $scale_pre, $thickness);
+        if($path === null) {
+            header('Content-type: image/jpeg');
+        }
+        return imagejpeg($im, $path, 100);
     }
 
     /**
