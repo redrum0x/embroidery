@@ -148,6 +148,24 @@ class ImageEmbroidery
         return imagejpeg($im, $path, 100);
     }
 
+
+    /**
+     * @param PesFile $embroidery
+     * @param string $path
+     * @param int $scale_post
+     * @param bool $scale_pre
+     * @param int $thickness
+     * @return bool
+     */
+    public function embroidery2Png(PesFile $embroidery, string $path = null, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1): bool
+    {
+        $im = $this->embroidery2image($embroidery, $scale_post, $scale_pre, $thickness);
+        if($path === null) {
+            header('Content-type: image/png');
+        }
+        return imagepng($im, $path, 100);
+    }
+
     /**
      * @param int $r
      * @param int $g
