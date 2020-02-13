@@ -60,7 +60,7 @@ class ImageEmbroidery
     public function embroidery2image(PesFile $embroidery, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1)
     {
         // Create image
-        $im = imagecreatetruecolor(ceil($embroidery->imageWidth * $scale_post), ceil($embroidery->imageHeight * $scale_post));
+        $im = imagecreatetruecolor(ceil($embroidery->imageWidth * $scale_post) + 10, ceil($embroidery->imageHeight * $scale_post) + 10);
         imagesavealpha($im, true);
         imagealphablending($im, false);
         $color = imagecolorallocatealpha($im, 255, 255, 255, 127);
@@ -74,10 +74,10 @@ class ImageEmbroidery
             foreach ($block->stitches as $stitch) {
                 if ($x !== false) {
                     imageline($im,
-                        ($x - $embroidery->min->x) * $scale_post,
-                        ($y - $embroidery->min->y) * $scale_post,
-                        ($stitch->x - $embroidery->min->x) * $scale_post,
-                        ($stitch->y - $embroidery->min->y) * $scale_post,
+                        ($x - $embroidery->min->x) * $scale_post + 5,
+                        ($y - $embroidery->min->y) * $scale_post + 5,
+                        ($stitch->x - $embroidery->min->x) * $scale_post + 5,
+                        ($stitch->y - $embroidery->min->y) * $scale_post + 5,
                         $color);
                 }
                 $x = $stitch->x;
@@ -142,10 +142,16 @@ class ImageEmbroidery
     public function embroidery2Jpg(PesFile $embroidery, string $path = null, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1): bool
     {
         $im = $this->embroidery2image($embroidery, $scale_post, $scale_pre, $thickness);
-        if($path === null) {
-            header('Content-type: image/jpeg');
+        if ($path !== null) {
+            return imagejpeg($im, $path, 100);
+
         }
-        return imagejpeg($im, $path, 100);
+        if (!headers_sent()) {
+            header_remove();
+        }
+        header('Content-type: image/jpeg');
+        imagejpeg($im, $path, 100);
+        exit;
     }
 
 
@@ -160,10 +166,15 @@ class ImageEmbroidery
     public function embroidery2Png(PesFile $embroidery, string $path = null, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1): bool
     {
         $im = $this->embroidery2image($embroidery, $scale_post, $scale_pre, $thickness);
-        if($path === null) {
-            header('Content-type: image/png');
+        if ($path !== null) {
+            return imagepng($im, $path);
         }
-        return imagepng($im, $path, 100);
+        if (!headers_sent()) {
+            header_remove();
+        }
+        header('Content-type: image/png');
+        imagejpeg($im, $path, 100);
+        exit;
     }
 
     /**
