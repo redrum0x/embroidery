@@ -3,10 +3,10 @@
 namespace redrum0x\embroidery;
 
 /**
- * Class PesColor
+ * Class StitchColor
  * @package redrum0x\embroidery
  */
-class PesColor
+class StitchColor
 {
     /**
      * @var int
@@ -24,7 +24,7 @@ class PesColor
     public $b;
 
     /**
-     * PesColor constructor.
+     * StitchColor constructor.
      * @param int $r
      * @param int $g
      * @param int $b

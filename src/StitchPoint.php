@@ -4,10 +4,10 @@
 namespace redrum0x\embroidery;
 
 /**
- * Class PesPoint
+ * Class StitchPoint
  * @package redrum0x\embroidery
  */
-class PesPoint
+class StitchPoint
 {
     /**
      * @var int

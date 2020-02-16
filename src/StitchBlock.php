@@ -9,7 +9,7 @@ namespace redrum0x\embroidery;
 class StitchBlock
 {
     /**
-     * @var PesColor
+     * @var StitchColor
      */
     public $color;
 
@@ -33,6 +33,6 @@ class StitchBlock
      */
     public function __construct()
     {
-        $this->color = new PesColor();
+        $this->color = new StitchColor();
     }
 }

@@ -2,17 +2,18 @@
 
 namespace redrum0x\embroidery;
 
+use redrum0x\embroidery\pes\PesFile;
 use SimpleXMLElement;
 
 class ImageEmbroidery
 {
     /**
-     * @param PesFile $embroidery
+     * @param AbstractStitchFile $embroidery
      * @param bool $base
      * @param int $scale_post
      * @param bool $scale_pre
      */
-    public function imageEmbroidery(PesFile $embroidery, bool $base = false, int $scale_post = 1, bool $scale_pre = false)
+    public function imageEmbroidery(AbstractStitchFile $embroidery, bool $base = false, int $scale_post = 1, bool $scale_pre = false)
     {
         $im = $this->embroidery2image($embroidery, $scale_post, $scale_pre);
         if ($base) {
@@ -51,13 +52,13 @@ class ImageEmbroidery
     }
 
     /**
-     * @param PesFile $embroidery
+     * @param AbstractStitchFile $embroidery
      * @param int $scale_post
      * @param bool $scale_pre
      * @param int $thickness
      * @return false|resource
      */
-    public function embroidery2image(PesFile $embroidery, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1)
+    public function embroidery2image(AbstractStitchFile $embroidery, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1)
     {
         // Create image
         $im = imagecreatetruecolor(ceil($embroidery->imageWidth * $scale_post) + 10, ceil($embroidery->imageHeight * $scale_post) + 10);
@@ -99,12 +100,12 @@ class ImageEmbroidery
     }
 
     /**
-     * @param PesFile $embroidery
+     * @param AbstractStitchFile $embroidery
      * @param int $scale
      * @param int $thickness
      * @return mixed
      */
-    public function embroidery2svg(PesFile $embroidery, int $scale = 1, int $thickness = 1)
+    public function embroidery2svg(AbstractStitchFile $embroidery, int $scale = 1, int $thickness = 1)
     {
         // header('Content-Type: image/svg+xml');
         $xml = new SimpleXMLElement('<svg />');
@@ -132,14 +133,14 @@ class ImageEmbroidery
     }
 
     /**
-     * @param PesFile $embroidery
+     * @param AbstractStitchFile $embroidery
      * @param string $path
      * @param int $scale_post
      * @param bool $scale_pre
      * @param int $thickness
      * @return bool
      */
-    public function embroidery2Jpg(PesFile $embroidery, string $path = null, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1): bool
+    public function embroidery2Jpg(AbstractStitchFile $embroidery, string $path = null, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1): bool
     {
         $im = $this->embroidery2image($embroidery, $scale_post, $scale_pre, $thickness);
         if ($path !== null) {
@@ -156,14 +157,14 @@ class ImageEmbroidery
 
 
     /**
-     * @param PesFile $embroidery
+     * @param AbstractStitchFile $embroidery
      * @param string $path
      * @param int $scale_post
      * @param bool $scale_pre
      * @param int $thickness
      * @return bool
      */
-    public function embroidery2Png(PesFile $embroidery, string $path = null, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1): bool
+    public function embroidery2Png(AbstractStitchFile $embroidery, string $path = null, int $scale_post = 1, bool $scale_pre = false, int $thickness = 1): bool
     {
         $im = $this->embroidery2image($embroidery, $scale_post, $scale_pre, $thickness);
         if ($path !== null) {

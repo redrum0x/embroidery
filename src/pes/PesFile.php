@@ -1,6 +1,6 @@
 <?php
 
-namespace redrum0x\embroidery;
+namespace redrum0x\embroidery\pes;
 
 /*
 Embroidery Reader - an application to view .pes embroidery designs
@@ -27,61 +27,21 @@ A copy of the full GPL 2 license can be found in the docs directory.
 You can contact me at http://www.njcrawford.com/contact.php.
 */
 
+use redrum0x\embroidery\ByteReader;
+use redrum0x\embroidery\StitchBlock;
+use redrum0x\embroidery\StitchColor;
+use redrum0x\embroidery\AbstractStitchFile;
+use redrum0x\embroidery\StitchPoint;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
 
-class PesFile
+class PesFile extends AbstractStitchFile
 {
     /**
-     * @var int
-     */
-    public $imageWidth;
-
-    /**
-     * @var int
-     */
-    public $imageHeight;
-
-    /**
-     * @var int
-     */
-    public $pesHeader; // int64
-
-    /**
-     * @var StitchBlock[]
-     */
-    public $blocks;
-
-    /**
-     * @var int
-     */
-    public $startStitches = 0; // int64
-
-    /**
-     * @var string
-     */
-    public $lastError = '';
-
-    /**
-     * @var string
-     */
-    public $pesNum = '';
-
-    /**
-     * @var PesPoint
+     * @var StitchPoint
      */
     public $min; // point
-
-    /**
-     * @var PesColor[]
-     */
-    public $colors;
-
-    /**
-     * @var int
-     */
-    public $countStitches;
 
     /**
      * PesFile constructor.
@@ -90,7 +50,7 @@ class PesFile
      */
     public function __construct(string $filename)
     {
-        $this->min = new PesPoint();
+        $this->min = new StitchPoint();
         $this->OpenFile($filename);
     }
 
@@ -118,17 +78,17 @@ class PesFile
         fread($file, 4);
 
         // pecstart
-        $pecstart = $this->readInt32($file);
+        $pecstart = ByteReader::readInt32($file);
 
         // Design dimensions
-        $this->imageWidth = $this->readInt16($file);
-        $this->imageHeight = $this->readInt16($file);
+        $this->imageWidth = ByteReader::readInt16($file);
+        $this->imageHeight = ByteReader::readInt16($file);
 
         // Color table
         fseek($file, $pecstart + 48);
-        $numColors = $this->readInt8($file) + 1;
+        $numColors = ByteReader::readInt8($file) + 1;
         for ($x = 0; $x < $numColors; $x++) {
-            $colorList[] = $this->readInt8($file);
+            $colorList[] = ByteReader::readInt8($file);
         }
 
         // Stitch data
@@ -143,8 +103,8 @@ class PesFile
         $colorNum = -1;
         $tempStitches = array();
         while (!$thisPartIsDone && !feof($file)) {
-            $val1 = $this->readInt8($file);
-            $val2 = $this->readInt8($file);
+            $val1 = ByteReader::readInt8($file);
+            $val2 = ByteReader::readInt8($file);
             if ($val1 === 255 && $val2 === 0) {
                 //end of stitches
                 $thisPartIsDone = true;
@@ -183,7 +143,7 @@ class PesFile
                         $deltaX -= 4096;
                     }
                     //read next byte for Y value
-                    $val2 = $this->readInt8($file);
+                    $val2 = ByteReader::readInt8($file);
                 } else {
                     //normal stitch
                     $deltaX = $val1;
@@ -194,7 +154,7 @@ class PesFile
 
                 if (($val2 & 128) === 128) {//$80
                     //this is a jump stitch
-                    $val3 = $this->readInt8($file);
+                    $val3 = ByteReader::readInt8($file);
                     $deltaY = (($val2 & 15) * 256) + $val3;
                     if (($deltaY & 2048) === 2048) {
                         $deltaY -= 4096;
@@ -209,7 +169,7 @@ class PesFile
 
                 $prevX += $deltaX;
                 $prevY += $deltaY;
-                $tempStitches[] = new PesPoint($prevX, $prevY);
+                $tempStitches[] = new StitchPoint($prevX, $prevY);
 
                 if ($prevX > $maxX) {
                     $maxX = $prevX;
@@ -236,40 +196,11 @@ class PesFile
     }
 
     /**
-     * @param $file
-     * @return int
-     */
-    private function readInt8($file): int
-    {
-        return (ord(fread($file, 1)));
-    }
-
-    /**
-     * @param $file
-     * @return mixed
-     */
-    private function readInt16($file)
-    {
-        $res = unpack('v', fread($file, 2));
-        return (array_shift($res));
-    }
-
-    /**
-     * @param $file
-     * @return mixed
-     */
-    private function readInt32($file)
-    {
-        $res = unpack('V', fread($file, 4));
-        return (array_shift($res));
-    }
-
-    /**
      * @param $index
-     * @return PesColor
+     * @return StitchColor
      * @throws ReflectionException
      */
-    private function getColorFromIndex($index): PesColor
+    private function getColorFromIndex($index): StitchColor
     {
         $colors = [
             1 => [14, 31, 124],
@@ -342,7 +273,7 @@ class PesFile
             throw new RuntimeException('Color ' . $index . ' invalid');
         }
 
-        $reflector = new ReflectionClass(PesColor::class);
+        $reflector = new ReflectionClass(StitchColor::class);
         return $reflector->newInstanceArgs($colors[$index]);
     }
 
