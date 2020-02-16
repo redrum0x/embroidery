@@ -10,6 +10,7 @@ namespace redrum0x\embroidery;
 class StitchPoint
 {
     public const TYPE_JUMP = 'jump';
+    public const TYPE_STITCH = 'stitch';
     public const TYPE_MOVE = 'move';
     public const TYPE_COLOR_CHANGE = 'color_change';
     /**

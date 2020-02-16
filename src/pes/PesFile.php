@@ -152,7 +152,7 @@ class PesFile extends AbstractStitchFile
                     if ($deltaX > 63) {
                         $deltaX -= 128;
                     }
-                    $pointType = StitchPoint::TYPE_MOVE;
+                    $pointType = StitchPoint::TYPE_STITCH;
                 }
 
                 if (($val2 & 128) === 128) {//$80
@@ -169,7 +169,7 @@ class PesFile extends AbstractStitchFile
                     if ($deltaY > 63) {
                         $deltaY -= 128;
                     }
-                    $pointType = StitchPoint::TYPE_MOVE;
+                    $pointType = StitchPoint::TYPE_STITCH;
                 }
 
                 $prevX += $deltaX;
