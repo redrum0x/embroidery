@@ -103,6 +103,7 @@ class PesFile extends AbstractStitchFile
         $colorNum = -1;
         $tempStitches = array();
         while (!$thisPartIsDone && !feof($file)) {
+            $pointType = StitchPoint::TYPE_MOVE;
             $val1 = ByteReader::readInt8($file);
             $val2 = ByteReader::readInt8($file);
             if ($val1 === 255 && $val2 === 0) {
@@ -144,12 +145,14 @@ class PesFile extends AbstractStitchFile
                     }
                     //read next byte for Y value
                     $val2 = ByteReader::readInt8($file);
+                    $pointType = StitchPoint::TYPE_JUMP;
                 } else {
                     //normal stitch
                     $deltaX = $val1;
                     if ($deltaX > 63) {
                         $deltaX -= 128;
                     }
+                    $pointType = StitchPoint::TYPE_MOVE;
                 }
 
                 if (($val2 & 128) === 128) {//$80
@@ -159,17 +162,19 @@ class PesFile extends AbstractStitchFile
                     if (($deltaY & 2048) === 2048) {
                         $deltaY -= 4096;
                     }
+                    $pointType = StitchPoint::TYPE_JUMP;
                 } else {
                     //normal stitch
                     $deltaY = $val2;
                     if ($deltaY > 63) {
                         $deltaY -= 128;
                     }
+                    $pointType = StitchPoint::TYPE_MOVE;
                 }
 
                 $prevX += $deltaX;
                 $prevY += $deltaY;
-                $tempStitches[] = new StitchPoint($prevX, $prevY);
+                $tempStitches[] = new StitchPoint($prevX, $prevY, $pointType);
 
                 if ($prevX > $maxX) {
                     $maxX = $prevX;
